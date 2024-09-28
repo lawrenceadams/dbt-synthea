@@ -1,0 +1,77 @@
+name: Build Dev Dbt
+on:
+  workflow_dispatch:
+
+jobs:
+    duckdb:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.x'
+            - name: Install dependencies
+              run: |
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
+            - name: Setup profile
+              run: |
+                echo "default:" > profiles.yml
+                echo "  target: dev" >> profiles.yml
+                echo "  outputs:" >> profiles.yml
+                echo "    dev:" >> profiles.yml
+                echo "      type: postgres" >> profiles.yml
+                echo "      host: localhost" >> profiles.yml
+                echo "      user: my_weather_app" >> profiles.yml
+                echo "      pass: my_password" >> profiles.yml
+                echo "      port: 5432" >> profiles.yml
+                echo "      dbname: postgres" >> profiles.yml
+            - name: Run dbt
+              run: |
+                dbt run
+                dbt test
+    
+    postgres:
+        runs-on: ubuntu-latest
+        services:
+            postgres:
+              image: postgres:16
+              env:
+                POSTGRES_USER: postgres
+                POSTGRES_PASSWORD: postgres
+              options: >-
+                --health-cmd pg_isready
+                --health-interval 10s
+                --health-timeout 5s
+                --health-retries 5
+              ports:
+                # Maps tcp port 5432 on service container to the host
+                - 5432:5432
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.x'
+            - name: Install dependencies
+              run: |
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
+            - name: Setup profile
+              run: |
+                echo "default:" > profiles.yml
+                echo "  target: dev" >> profiles.yml
+                echo "  outputs:" >> profiles.yml
+                echo "    dev:" >> profiles.yml
+                echo "      type: postgres" >> profiles.yml
+                echo "      host: localhost" >> profiles.yml
+                echo "      user: postgres" >> profiles.yml
+                echo "      password: postgres" >> profiles.yml
+                echo "      port: 5432" >> profiles.yml
+                echo "      dbname: postgres" >> profiles.yml
+                
+            - name: Run dbt
+              run: |
+                dbt run
+                dbt test
