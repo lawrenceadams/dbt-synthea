@@ -42,8 +42,6 @@ jobs:
               run: |
                 git fetch origin
                 pre-commit run --from-ref origin/${{ github.event.pull_request.base.ref }} --to-ref ${{ github.event.pull_request.head.sha }}
-
-
     duckdb:
         needs: lint
         runs-on: ubuntu-latest
