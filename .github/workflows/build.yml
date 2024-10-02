@@ -27,7 +27,9 @@ jobs:
                 pip install -r requirements/duckdb.txt
             - name: Setup profile
               run: |
-                cat << EOF > profiles.yml
+                mkdir ~/.dbt
+                dbt deps
+                cat << EOF > ~/.dbt/profiles.yml
                 synthea_omop_etl:
                   outputs:
                     dev:
@@ -38,7 +40,9 @@ jobs:
                 EOF
             - name: Sqlfluff Lint
               run: |
-                diff-quality --violations sqlfluff --compare-branch upstream
+                git fetch origin
+                pre-commit run --from-ref origin/${{ github.event.pull_request.base.ref }} --to-ref ${{ github.event.pull_request.head.sha }}
+
 
     duckdb:
         needs: lint
