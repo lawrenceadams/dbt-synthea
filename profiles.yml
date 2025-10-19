@@ -1,0 +1,17 @@
+synthea_omop_etl:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: ""  # Leave empty - runs under current account context
+      user: ""     # Leave empty - runs under current user context
+      
+      # Configure these values for your Snowflake environment
+      warehouse: COMPUTE_WH
+      database: DBT_OMOP
+      schema: LA_DEV
+      role: SYSADMIN
+      
+      # Connection settings
+      threads: 4
+      client_session_keep_alive: false

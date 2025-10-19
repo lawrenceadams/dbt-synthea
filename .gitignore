@@ -10,6 +10,5 @@ data/
 .Rhistory
 *.duckdb
 .dbt/
-profiles.yml
 .vscode/mcp.json
 .cursor/mcp.json
